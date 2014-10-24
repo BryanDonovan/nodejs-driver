@@ -1,15 +1,10 @@
 var assert = require('assert');
-var async = require('async');
-var util = require('util');
 
 var helper = require('../test-helper.js');
-var Client = require('../../lib/client.js');
 var clientOptions = require('../../lib/client-options.js');
 var Host = require('../../lib/host.js').Host;
 var Metadata = require('../../lib/metadata.js');
 var tokenizer = require('../../lib/tokenizer.js');
-var types = require('../../lib/types.js');
-var utils = require('../../lib/utils.js');
 
 describe('Metadata', function () {
   describe('#getReplicas()', function () {
@@ -17,8 +12,8 @@ describe('Metadata', function () {
       var metadata = new Metadata();
       metadata.tokenizer = new tokenizer.Murmur3Tokenizer();
       //Use the value as token
-      metadata.tokenizer.hash = function (b) { return b[0]};
-      metadata.tokenizer.compare = function (a, b) {if (a > b) return 1; if (a < b) return -1; return 0};
+      metadata.tokenizer.hash = function (b) { return b[0]; };
+      metadata.tokenizer.compare = function (a, b) { if (a > b) return 1; if (a < b) return -1; return 0; };
       metadata.ring = [0, 1, 2, 3, 4, 5];
       metadata.primaryReplicas = {'0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5'};
       metadata.setKeyspaces({rows: [{
@@ -46,8 +41,8 @@ describe('Metadata', function () {
       var metadata = new Metadata();
       metadata.tokenizer = new tokenizer.Murmur3Tokenizer();
       //Use the value as token
-      metadata.tokenizer.hash = function (b) { return b[0]};
-      metadata.tokenizer.compare = function (a, b) {if (a > b) return 1; if (a < b) return -1; return 0};
+      metadata.tokenizer.hash = function (b) { return b[0]; };
+      metadata.tokenizer.compare = function (a, b) { if (a > b) return 1; if (a < b) return -1; return 0; };
       metadata.datacenters = {'dc1': 4, 'dc2': 4};
       metadata.ring = [0, 1, 2, 3, 4, 5, 6, 7];
       //load even primary replicas

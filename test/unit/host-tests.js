@@ -1,6 +1,5 @@
 var assert = require('assert');
 var async = require('async');
-var util = require('util');
 var rewire = require('rewire');
 
 var hostModule = rewire('../../lib/host.js');
@@ -13,7 +12,7 @@ var reconnection = require('../../lib/policies/reconnection.js');
 before(function () {
   //inject a mock Connection class
   var connectionMock = function () {};
-  connectionMock.prototype.open = function noop (cb) {cb()};
+  connectionMock.prototype.open = function noop (cb) {cb();};
   hostModule.__set__("Connection", connectionMock);
 });
 
@@ -61,6 +60,7 @@ describe('Host', function () {
         reconnection: new reconnection.ConstantReconnectionPolicy(1)
       }
     };
+
     it('should get an open connection', function (done) {
       var host = new Host('0.0.0.1', 2, options);
       host.borrowConnection(function (err, c) {
@@ -73,6 +73,7 @@ describe('Host', function () {
         done();
       });
     });
+
     it('should create a pool of size determined by the relative distance local', function (done) {
       options.pooling.coreConnectionsPerHost[types.distance.local] = 5;
       options.pooling.maxConnectionsPerHost[types.distance.local] = 10;
@@ -87,6 +88,7 @@ describe('Host', function () {
         done();
       });
     });
+
     it('should create a pool of size determined by the relative distance remote', function (done) {
       options.pooling.coreConnectionsPerHost[types.distance.remote] = 2;
       options.pooling.maxConnectionsPerHost[types.distance.remote] = 4;
@@ -101,6 +103,7 @@ describe('Host', function () {
         done();
       });
     });
+
     it('should resize the pool after distance is set', function (done) {
       options.pooling.coreConnectionsPerHost[types.distance.local] = 3;
       options.pooling.maxConnectionsPerHost[types.distance.local] = 4;
@@ -131,6 +134,7 @@ describe('Host', function () {
       ], done);
     });
   });
+
   describe('#setUp()', function () {
     //Use a test policy that starts at zero to be easier to track down
     var maxDelay = 1000;
@@ -138,7 +142,9 @@ describe('Host', function () {
     var options = {
       policies: {
         reconnection: new reconnection.ExponentialReconnectionPolicy(100, maxDelay, true)
-      }};
+      }
+    };
+
     it('should reset the reconnection schedule when bring it up', function () {
       var host = newHostInstance(options);
       host.setDown();
@@ -162,11 +168,14 @@ describe('Host', function () {
       assert.strictEqual(host.reconnectionDelay, 0);
     });
   });
+
   describe('#setDown()', function () {
     var options = {
       policies: {
         reconnection: new reconnection.ConstantReconnectionPolicy(100)
-      }};
+      }
+    };
+
     it('should emit event when called', function (done) {
       var host = newHostInstance(options);
       host.on('down', done);

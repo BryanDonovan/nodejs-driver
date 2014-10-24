@@ -1,8 +1,8 @@
 var assert = require('assert');
 var async = require('async');
-var util = require('util');
 var rewire = require('rewire');
 
+var Client = rewire('../../lib/client.js');
 var policies = require('../../lib/policies');
 var helper = require('../test-helper.js');
 var errors = require('../../lib/errors.js');
@@ -14,19 +14,20 @@ describe('Client', function () {
   describe('constructor', function () {
     it('should throw an exception when contactPoints are not provided', function () {
       assert.throws(function () {
-        var client = new Client({});
+        new Client({});
       });
       assert.throws(function () {
-        var client = new Client({contactPoints: []});
+        new Client({contactPoints: []});
       });
       assert.throws(function () {
-        var client = new Client(null);
+        new Client(null);
       });
       assert.throws(function () {
-        var client = new Client();
+        new Client();
       });
     });
   });
+
   describe('#connect()', function () {
     this.timeout(35000);
     it('should fail if no host name can be resolved', function (done) {
@@ -41,6 +42,7 @@ describe('Client', function () {
         done();
       });
     });
+
     it('should connect once and queue if multiple calls in parallel', function (done) {
       var Client = rewire('../../lib/client.js');
       var initCounter = 0;
@@ -52,7 +54,7 @@ describe('Client', function () {
           initCounter++;
           //Async
           setTimeout(cb, 100);
-        }
+        };
       };
       Client.__set__("ControlConnection", controlConnectionMock);
       var options = utils.extend({
@@ -76,6 +78,7 @@ describe('Client', function () {
       });
     });
   });
+
   describe('#_getPrepared()', function () {
     var Client = rewire('../../lib/client.js');
     var requestHandlerMock = function () {this.counter = 0;};
@@ -88,6 +91,7 @@ describe('Client', function () {
       }, 50);
     };
     Client.__set__("RequestHandler", requestHandlerMock);
+
     it('should prepare making request if not exist', function (done) {
       var client = new Client({contactPoints: ['host']});
       prepareCounter = 0;
@@ -100,6 +104,7 @@ describe('Client', function () {
         done();
       });
     });
+
     it('should prepare make the same request once and queue the rest', function (done) {
       var client = new Client({contactPoints: ['host']});
       prepareCounter = 0;
@@ -132,6 +137,7 @@ describe('Client', function () {
         done();
       });
     });
+
     it('should check for overflow and remove older', function (done) {
       var maxPrepared = 10;
       var client = new Client({contactPoints: ['host'], maxPrepared: maxPrepared});
@@ -143,6 +149,7 @@ describe('Client', function () {
         done();
       });
     });
+
     it('should callback in error if request send fails', function (done) {
       requestHandlerMock.prototype.send = function noop (query, options, cb) {
         setTimeout(function () {
@@ -158,6 +165,7 @@ describe('Client', function () {
       });
     });
   });
+
   describe('#batch()', function () {
     var Client = rewire('../../lib/client.js');
     var requestHandlerMock = function () {this.counter = 0;};
@@ -168,6 +176,7 @@ describe('Client', function () {
       }, 50);
     };
     Client.__set__("RequestHandler", requestHandlerMock);
+
     it('should internally call to connect', function (done) {
       var client = new Client(helper.baseOptions);
       var connectCalled = false;

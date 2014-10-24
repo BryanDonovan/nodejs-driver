@@ -1,6 +1,5 @@
 var assert = require('assert');
 var async = require('async');
-var util = require('util');
 
 var helper = require('../test-helper.js');
 var Client = require('../../lib/client.js');

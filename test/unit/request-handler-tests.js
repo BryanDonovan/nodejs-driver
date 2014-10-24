@@ -1,7 +1,4 @@
 var assert = require('assert');
-var async = require('async');
-var util = require('util');
-var rewire = require('rewire');
 
 var RequestHandler = require('../../lib/request-handler.js');
 var errors = require('../../lib/errors.js');
@@ -11,7 +8,7 @@ var retry = require('../../lib/policies/retry.js');
 
 var options = (function () {
   var loadBalancing = require('../../lib/policies/load-balancing.js');
-  var reconnection = require('../../lib/policies/reconnection.js');;
+  var reconnection = require('../../lib/policies/reconnection.js');
   return {
     policies: {
       loadBalancing: new loadBalancing.RoundRobinPolicy(),
@@ -74,7 +71,7 @@ describe('RequestHandler', function () {
       policy.onWriteTimeout = function (info) {
         assert.notEqual(info, null);
         policyCalled = true;
-        return {decision: retry.RetryPolicy.retryDecision.retry}
+        return {decision: retry.RetryPolicy.retryDecision.retry};
       };
       var handler = new RequestHandler(null, utils.extend({}, options, { policies: { retry: policy }}));
       var responseError = new errors.ResponseError();

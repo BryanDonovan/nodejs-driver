@@ -1,10 +1,8 @@
 var assert = require('assert');
-var async = require('async');
 
 var helper = require('../test-helper.js');
 var ControlConnection = require('../../lib/control-connection.js');
 var Host = require('../../lib/host.js').Host;
-var utils = require('../../lib/utils.js');
 var clientOptions = require('../../lib/client-options.js');
 
 describe('ControlConnection', function () {
@@ -36,6 +34,7 @@ describe('ControlConnection', function () {
       assert.strictEqual(typeof cc.metadata.keyspaces[ksName], 'undefined');
     });
   });
+
   describe('#getAddressForPeerHost()', function() {
     it('should handle null, 0.0.0.0 and valid addresses', function () {
       var options = clientOptions.extend({}, helper.baseOptions);
@@ -59,6 +58,7 @@ describe('ControlConnection', function () {
       assert.strictEqual(address, null);
     });
   });
+
   describe('#setPeersInfo()', function () {
     it('should use not add invalid addresses', function () {
       var options = clientOptions.extend({}, helper.baseOptions);

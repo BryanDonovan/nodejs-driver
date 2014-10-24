@@ -1,24 +1,23 @@
 var assert = require('assert');
 var async = require('async');
-var util = require('util');
 
 var Connection = require('../../lib/connection.js');
 var defaultOptions = require('../../lib/client-options.js').defaultOptions();
-var types = require('../../lib/types.js');
 var utils = require('../../lib/utils.js');
 var helper = require('../test-helper.js');
 
 describe('Connection', function () {
   describe('#prepareOnce()', function () {
     function prepareAndAssert(connection, query) {
-      return (function (cb) {
+      return function (cb) {
         connection.prepareOnce(query, function (err, r) {
           assert.ifError(err);
           assert.strictEqual(query, r);
           cb();
         });
-      });
+      };
     }
+
     it('should prepare different queries', function (done) {
       var connection = newInstance();
       //override sendStream behaviour
@@ -36,6 +35,7 @@ describe('Connection', function () {
         done();
       });
     });
+
     it('should prepare different queries with keyspace', function (done) {
       var connection = newInstance();
       connection.keyspace = 'ks1';
@@ -54,6 +54,7 @@ describe('Connection', function () {
         done();
       });
     });
+
     it('should prepare the same query once', function (done) {
       var connection = newInstance();
       var ioCount = 0;
@@ -74,6 +75,7 @@ describe('Connection', function () {
         done();
       });
     });
+
     it('should prepare the same query once with keyspace', function (done) {
       var connection = newInstance();
       connection.keyspace = 'ks1';

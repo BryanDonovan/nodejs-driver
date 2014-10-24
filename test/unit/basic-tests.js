@@ -1,18 +1,16 @@
 var assert = require('assert');
 var util = require('util');
 var events = require('events');
-var uuid = require('node-uuid');
-var async = require('async');
 var utils = require('../../lib/utils.js');
 
 var Client = require('../../lib/client.js');
+var Connection = require('../../lib/connection.js');
 var clientOptions = require('../../lib/client-options.js');
 var types = require('../../lib/types.js');
 var encoder = require('../../lib/encoder.js');
 var dataTypes = types.dataTypes;
 var loadBalancing = require('../../lib/policies/load-balancing.js');
 var retry = require('../../lib/policies/retry.js');
-var helper = require('../test-helper.js')
 
 describe('encoder', function () {
   describe('#guessDataType()', function () {
@@ -168,14 +166,14 @@ describe('encoder', function () {
       assert.throws(function () {
         typeEncoder.encode({}, dataTypes.list);
       }, TypeError);
-    })
+    });
   });
+
   describe('#setRoutingKey', function () {
     it('should concat Array of buffers in the correct format',function () {
       var options = {
         routingKey: [new Buffer([1]), new Buffer([2]), new Buffer([3, 3])]
       };
-      var initialRoutingKey = options.routingKey.toString('hex');
       encoder.setRoutingKey([1, 'text'], options);
       assert.strictEqual(options.routingKey.toString('hex'), '00010100000102000002030300');
 
@@ -185,6 +183,7 @@ describe('encoder', function () {
       encoder.setRoutingKey([1, 'text'], options);
       assert.strictEqual(options.routingKey.toString('hex'), '01');
     });
+
     it('should not affect Buffer routing keys', function () {
       var options = {
         routingKey: new Buffer([1, 2, 3, 4])
@@ -200,6 +199,7 @@ describe('encoder', function () {
       encoder.setRoutingKey([1, 'text'], options);
       assert.strictEqual(options.routingKey.toString('hex'), initialRoutingKey);
     });
+
     it('should build routing key based on routingIndexes', function () {
       var options = {
         hints: ['int'],
@@ -232,6 +232,7 @@ describe('encoder', function () {
       //length1 + buffer1 + 0 + length2 + buffer2 + 0
       assert.strictEqual(options.routingKey.toString('hex'), '0004' + new Buffer('yeah').toString('hex') + '00' + '0004' + '01010101' + '00');
     });
+
     it('should throw if the type could not be encoded', function () {
       assert.throws(function () {
         var options = {
@@ -253,6 +254,7 @@ describe('encoder', function () {
 describe('types', function () {
   describe('Long', function () {
     var Long = types.Long;
+
     it('should convert from and to Buffer', function () {
       [
        //int64 decimal value    //hex value
@@ -297,7 +299,7 @@ describe('types', function () {
     it('should be readable as soon as it has data', function (done) {
       var buf = [];
       var stream = new types.ResultStream();
-      
+
       stream.on('end', function streamEnd() {
         assert.equal(Buffer.concat(buf).toString(), 'Jimmy McNulty');
         done();
@@ -308,7 +310,7 @@ describe('types', function () {
           buf.push(item);
         }
       });
-      
+
       stream.add(new Buffer('Jimmy'));
       stream.add(new Buffer(' '));
       stream.add(new Buffer('McNulty'));
@@ -360,8 +362,8 @@ describe('types', function () {
       var buf = [];
       var stream = new types.ResultStream({objectMode: true});
       //passing objects
-      stream.add({toString: function (){return 'One'}});
-      stream.add({toString: function (){return 'Two'}});
+      stream.add({toString: function () { return 'One'; }});
+      stream.add({toString: function () { return 'Two'; }});
       stream.add(null);
       stream.on('end', function streamEnd() {
         assert.equal(buf.join(' '), 'One Two');
@@ -388,16 +390,16 @@ describe('types', function () {
       assert.strictEqual(row.get(0), row['first']);
       assert.strictEqual(row.get('second'), row['second']);
       assert.strictEqual(row.get(1), row['second']);
-    })
-  })
+    });
+  });
 });
 
 describe('utils', function () {
   describe('#syncEvent()', function () {
     it('should execute callback once for all emitters', function () {
       var emitter1 = new events.EventEmitter();
-      var emitter2 = new events.EventEmitter(); 
-      var emitter3 = new events.EventEmitter(); 
+      var emitter2 = new events.EventEmitter();
+      var emitter3 = new events.EventEmitter();
       var callbackCounter = 0;
       utils.syncEvent([emitter1, emitter2, emitter3], 'dummy', this, function (text){
         assert.strictEqual(text, 'bop');
@@ -448,9 +450,9 @@ describe('utils', function () {
   describe('#funcCompare()', function () {
     it('should return a compare function valid for Array#sort', function () {
       var values = [
-        {id: 1, getValue : function () { return 100;}},
-        {id: 2, getValue : function () { return 3;}},
-        {id: 3, getValue : function () { return 1;}}
+        {id: 1, getValue: function () { return 100;}},
+        {id: 2, getValue: function () { return 3;}},
+        {id: 3, getValue: function () { return 1;}}
       ];
       values.sort(utils.funcCompare('getValue'));
       assert.strictEqual(values[0].id, 3);
@@ -540,6 +542,7 @@ describe('clientOptions', function () {
         clientOptions.extend(undefined);
       });
     });
+
     it('should create a new instance', function () {
       var a = {contactPoints: ['host1']};
       var options = clientOptions.extend(a);
@@ -554,6 +557,7 @@ describe('clientOptions', function () {
       assert.notStrictEqual(a, options);
       assert.notStrictEqual(options, clientOptions.defaultOptions());
     });
+
     it('should validate the policies', function () {
       var policy1 = new loadBalancing.RoundRobinPolicy();
       var policy2 = new retry.RetryPolicy();

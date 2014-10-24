@@ -1,5 +1,4 @@
 var assert = require('assert');
-var util = require('util');
 var async = require('async');
 
 var streams = require('../../lib/streams.js');
